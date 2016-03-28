@@ -1,0 +1,466 @@
+Arhitectura sistemelor de calcul
+
+Tema1 - Dobre Grigore Adelin 333CC
+
+Detalii de implementare:
+
+	Pentru primul test, in clasa DeviceThread am setat la inceputul rularii for-ului
+timepoint_done.wait() iar la final timepoint_done.clear().Astfel, threadurile vor 
+executa scripturile doar daca acestea au fost primite si va seta la final
+timepoint_done.set() cand nu s-au mai primit scripturi.
+
+	Apoi am adaugat clasa Reusable Barrier din laborator, care apeleaza metoda wait()
+la finalul buclei while din clasa DeviceThread. Astfel, un device care si-a terminat scripturile
+la un anumit moment, va astepta toate celelalte device-uri pentru a trece impreuna la momentul
+urmator. 
+
+	Mai departe, pentru a paraleliza procesul de executie al scripturilor, fiecare device 
+va contine o lista de threaduri ce vor primi ca parametri: scriptul ce trebuie executat impreuna
+cu locatia si vecinii device-ului de care apartine threadul. Noile threaduri sunt reprezentate de clasa
+MyThread. In deviceThread, cu fiecare script din array-ul de scripturi al device-ului, se va crea 
+un nou thread cu parametrii indicati si se vor adauga in lista. Apoi se va apela metoda start() si join()
+pentru a executa in paralel toate calculele.
+
+	Ultima conditie pe care am considerat-o necesara in trecerea testelor, a fost aceea a implementarii 
+unui array de lock-uri specifice fiecarei locatii in parte. Un lock al unei locatii are rolul de a preveni 
+scrierea si citirea valorii in acelasi timp si tocmai de aceea, array-ul de lockuri trebuie sa fie comun pentru 
+toate device-urile. 
+	
+	Am ales sa implementez share-ul lockurilor in assign_script. Astfel, in momentul primirii unei locatii, 
+daca device-ul nu are setat lock-ul pentru locatia respectiva se uita la toate celelalte device-uri si il seteaza 
+pe primul gasit. In caz contrar, isi va seta singur un lock pe care nu este necesar sa-l transmita mai departe, 
+pentru ca si celelalte device-uri vor avea acelasi comportament si il vor lua de la acesta. Pentru implementarea 
+acestui lcuru a mai fost necesara crearea unui array de device-uri la apelarea metodei setup_device().
+
+	In clasa MyThread, pentru a proteja scrierea datelor,  fac un acquire la inceput si un release la final, 
+operatie blocanta pentru orice thread din orice device(lockurile fiind share-uite)
+
+
+Observatie:
+Tema am testat-o doar local, pe o distributie Ubuntu 14.04 si obtin punctaj maxim doar cu modificarile mentionate mai sus.
+Rezultatul testelor:
+**************** Start     Test 0 *****************
+Errors in iteration 1 of 1:
+No errors
+***************** End     Test 0 ******************
+
+real	0m0.602s
+user	0m0.076s
+sys	0m0.016s
+
+**************** Start     Test 1 *****************
+Errors in iteration 1 of 5:
+No errors
+Errors in iteration 2 of 5:
+No errors
+Errors in iteration 3 of 5:
+No errors
+Errors in iteration 4 of 5:
+No errors
+Errors in iteration 5 of 5:
+No errors
+***************** End     Test 1 ******************
+
+real	0m0.192s
+user	0m0.152s
+sys	0m0.016s
+
+**************** Start     Test 2 *****************
+Errors in iteration 1 of 5:
+No errors
+Errors in iteration 2 of 5:
+No errors
+Errors in iteration 3 of 5:
+No errors
+Errors in iteration 4 of 5:
+No errors
+Errors in iteration 5 of 5:
+No errors
+***************** End     Test 2 ******************
+
+real	0m0.128s
+user	0m0.112s
+sys	0m0.016s
+
+**************** Start     Test 3 *****************
+Errors in iteration 1 of 10:
+No errors
+Errors in iteration 2 of 10:
+No errors
+Errors in iteration 3 of 10:
+No errors
+Errors in iteration 4 of 10:
+No errors
+Errors in iteration 5 of 10:
+No errors
+Errors in iteration 6 of 10:
+No errors
+Errors in iteration 7 of 10:
+No errors
+Errors in iteration 8 of 10:
+No errors
+Errors in iteration 9 of 10:
+No errors
+Errors in iteration 10 of 10:
+No errors
+***************** End     Test 3 ******************
+
+real	0m0.289s
+user	0m0.232s
+sys	0m0.032s
+
+**************** Start     Test 4 *****************
+Errors in iteration 1 of 5:
+No errors
+Errors in iteration 2 of 5:
+No errors
+Errors in iteration 3 of 5:
+No errors
+Errors in iteration 4 of 5:
+No errors
+Errors in iteration 5 of 5:
+No errors
+***************** End     Test 4 ******************
+
+real	0m10.301s
+user	0m0.236s
+sys	0m0.068s
+
+**************** Start     Test 5 *****************
+Errors in iteration 1 of 5:
+No errors
+Errors in iteration 2 of 5:
+No errors
+Errors in iteration 3 of 5:
+No errors
+Errors in iteration 4 of 5:
+No errors
+Errors in iteration 5 of 5:
+No errors
+***************** End     Test 5 ******************
+
+real	0m15.354s
+user	0m0.268s
+sys	0m0.092s
+
+**************** Start     Test 6 *****************
+Errors in iteration 1 of 5:
+No errors
+Errors in iteration 2 of 5:
+No errors
+Errors in iteration 3 of 5:
+No errors
+Errors in iteration 4 of 5:
+No errors
+Errors in iteration 5 of 5:
+No errors
+***************** End     Test 6 ******************
+
+real	0m17.840s
+user	0m0.264s
+sys	0m0.076s
+
+**************** Start     Test 7 *****************
+Errors in iteration 1 of 5:
+No errors
+Errors in iteration 2 of 5:
+No errors
+Errors in iteration 3 of 5:
+No errors
+Errors in iteration 4 of 5:
+No errors
+Errors in iteration 5 of 5:
+No errors
+***************** End     Test 7 ******************
+
+real	0m25.613s
+user	0m0.540s
+sys	0m0.276s
+
+**************** Start     Test 8 *****************
+Errors in iteration 1 of 5:
+No errors
+Errors in iteration 2 of 5:
+No errors
+Errors in iteration 3 of 5:
+No errors
+Errors in iteration 4 of 5:
+No errors
+Errors in iteration 5 of 5:
+No errors
+***************** End     Test 8 ******************
+
+real	0m25.922s
+user	0m0.804s
+sys	0m0.412s
+
+**************** Start     Test 9 *****************
+Errors in iteration 1 of 100:
+No errors
+Errors in iteration 2 of 100:
+No errors
+Errors in iteration 3 of 100:
+No errors
+Errors in iteration 4 of 100:
+No errors
+Errors in iteration 5 of 100:
+No errors
+Errors in iteration 6 of 100:
+No errors
+Errors in iteration 7 of 100:
+No errors
+Errors in iteration 8 of 100:
+No errors
+Errors in iteration 9 of 100:
+No errors
+Errors in iteration 10 of 100:
+No errors
+Errors in iteration 11 of 100:
+No errors
+Errors in iteration 12 of 100:
+No errors
+Errors in iteration 13 of 100:
+No errors
+Errors in iteration 14 of 100:
+No errors
+Errors in iteration 15 of 100:
+No errors
+Errors in iteration 16 of 100:
+No errors
+Errors in iteration 17 of 100:
+No errors
+Errors in iteration 18 of 100:
+No errors
+Errors in iteration 19 of 100:
+No errors
+Errors in iteration 20 of 100:
+No errors
+Errors in iteration 21 of 100:
+No errors
+Errors in iteration 22 of 100:
+No errors
+Errors in iteration 23 of 100:
+No errors
+Errors in iteration 24 of 100:
+No errors
+Errors in iteration 25 of 100:
+No errors
+Errors in iteration 26 of 100:
+No errors
+Errors in iteration 27 of 100:
+No errors
+Errors in iteration 28 of 100:
+No errors
+Errors in iteration 29 of 100:
+No errors
+Errors in iteration 30 of 100:
+No errors
+Errors in iteration 31 of 100:
+No errors
+Errors in iteration 32 of 100:
+No errors
+Errors in iteration 33 of 100:
+No errors
+Errors in iteration 34 of 100:
+No errors
+Errors in iteration 35 of 100:
+No errors
+Errors in iteration 36 of 100:
+No errors
+Errors in iteration 37 of 100:
+No errors
+Errors in iteration 38 of 100:
+No errors
+Errors in iteration 39 of 100:
+No errors
+Errors in iteration 40 of 100:
+No errors
+Errors in iteration 41 of 100:
+No errors
+Errors in iteration 42 of 100:
+No errors
+Errors in iteration 43 of 100:
+No errors
+Errors in iteration 44 of 100:
+No errors
+Errors in iteration 45 of 100:
+No errors
+Errors in iteration 46 of 100:
+No errors
+Errors in iteration 47 of 100:
+No errors
+Errors in iteration 48 of 100:
+No errors
+Errors in iteration 49 of 100:
+No errors
+Errors in iteration 50 of 100:
+No errors
+Errors in iteration 51 of 100:
+No errors
+Errors in iteration 52 of 100:
+No errors
+Errors in iteration 53 of 100:
+No errors
+Errors in iteration 54 of 100:
+No errors
+Errors in iteration 55 of 100:
+No errors
+Errors in iteration 56 of 100:
+No errors
+Errors in iteration 57 of 100:
+No errors
+Errors in iteration 58 of 100:
+No errors
+Errors in iteration 59 of 100:
+No errors
+Errors in iteration 60 of 100:
+No errors
+Errors in iteration 61 of 100:
+No errors
+Errors in iteration 62 of 100:
+No errors
+Errors in iteration 63 of 100:
+No errors
+Errors in iteration 64 of 100:
+No errors
+Errors in iteration 65 of 100:
+No errors
+Errors in iteration 66 of 100:
+No errors
+Errors in iteration 67 of 100:
+No errors
+Errors in iteration 68 of 100:
+No errors
+Errors in iteration 69 of 100:
+No errors
+Errors in iteration 70 of 100:
+No errors
+Errors in iteration 71 of 100:
+No errors
+Errors in iteration 72 of 100:
+No errors
+Errors in iteration 73 of 100:
+No errors
+Errors in iteration 74 of 100:
+No errors
+Errors in iteration 75 of 100:
+No errors
+Errors in iteration 76 of 100:
+No errors
+Errors in iteration 77 of 100:
+No errors
+Errors in iteration 78 of 100:
+No errors
+Errors in iteration 79 of 100:
+No errors
+Errors in iteration 80 of 100:
+No errors
+Errors in iteration 81 of 100:
+No errors
+Errors in iteration 82 of 100:
+No errors
+Errors in iteration 83 of 100:
+No errors
+Errors in iteration 84 of 100:
+No errors
+Errors in iteration 85 of 100:
+No errors
+Errors in iteration 86 of 100:
+No errors
+Errors in iteration 87 of 100:
+No errors
+Errors in iteration 88 of 100:
+No errors
+Errors in iteration 89 of 100:
+No errors
+Errors in iteration 90 of 100:
+No errors
+Errors in iteration 91 of 100:
+No errors
+Errors in iteration 92 of 100:
+No errors
+Errors in iteration 93 of 100:
+No errors
+Errors in iteration 94 of 100:
+No errors
+Errors in iteration 95 of 100:
+No errors
+Errors in iteration 96 of 100:
+No errors
+Errors in iteration 97 of 100:
+No errors
+Errors in iteration 98 of 100:
+No errors
+Errors in iteration 99 of 100:
+No errors
+Errors in iteration 100 of 100:
+No errors
+***************** End     Test 9 ******************
+
+real	5m22.709s
+user	0m32.372s
+sys	0m16.752s
+
+**************** Start    Test 10 *****************
+Errors in iteration 1 of 20:
+No errors
+Errors in iteration 2 of 20:
+No errors
+Errors in iteration 3 of 20:
+No errors
+Errors in iteration 4 of 20:
+No errors
+Errors in iteration 5 of 20:
+No errors
+Errors in iteration 6 of 20:
+No errors
+Errors in iteration 7 of 20:
+No errors
+Errors in iteration 8 of 20:
+No errors
+Errors in iteration 9 of 20:
+No errors
+Errors in iteration 10 of 20:
+No errors
+Errors in iteration 11 of 20:
+No errors
+Errors in iteration 12 of 20:
+No errors
+Errors in iteration 13 of 20:
+No errors
+Errors in iteration 14 of 20:
+No errors
+Errors in iteration 15 of 20:
+No errors
+Errors in iteration 16 of 20:
+No errors
+Errors in iteration 17 of 20:
+No errors
+Errors in iteration 18 of 20:
+No errors
+Errors in iteration 19 of 20:
+No errors
+Errors in iteration 20 of 20:
+No errors
+***************** End    Test 10 ******************
+
+real	3m0.687s
+user	0m4.408s
+sys	0m2.088s
+
+
+-----------------------------------------------------------------------
+
+Test 0     finished.................100% completed
+Test 1     finished.................100% completed
+Test 2     finished.................100% completed
+Test 3     finished.................100% completed
+Test 4     finished.................100% completed
+Test 5     finished.................100% completed
+Test 6     finished.................100% completed
+Test 7     finished.................100% completed
+Test 8     finished.................100% completed
+Test 9     finished.................100% completed
+Test 10    finished.................100% completed
+
+  
